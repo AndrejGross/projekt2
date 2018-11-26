@@ -100,7 +100,6 @@ void v(FILE **file,int *pocet_zaznamov, struct inzeraty *prvy)
         count++;
     }
 }
-
 struct inzeraty* p(FILE **file, int *pocet_zaznamov, struct inzeraty *prvy)
 {
     int k,poc=0;
@@ -197,6 +196,56 @@ struct inzeraty* h(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
 
     return prvy;
 }
+struct inzeraty* a(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
+{
+    int rok_v,count=0,k,j=0,i;
+    char znacka_auta[51],act_znacka[51],act_rok[10],zadanyRok[10];
+    scanf("%s",znacka_auta);
+    scanf("%d",&rok_v);
+    struct inzeraty *act;
+    act=prvy;
+
+    while(znacka_auta[j])
+        {
+            if (znacka_auta[j]<'A'||znacka_auta[j]>'Z')
+                znacka_auta[j]=znacka_auta[j]-32;
+            j++;
+        }
+
+    while(act!=NULL)
+    {
+        k=0;i=0;
+        sprintf(act_znacka,"%s",act->znacka);
+        sprintf(act_rok,"%d",act->rok_vyroby);
+        sprintf(zadanyRok,"%d",rok_v);
+
+        while(act_znacka[i])
+        {
+            if (act_znacka[i]<'A'||act_znacka[i]>'Z')
+                act_znacka[i]=act_znacka[i]-32;
+            i++;
+        }
+
+        for(i=0;i<4;i++)
+        {
+            if(act_rok[i]==zadanyRok[i])
+                k++;
+        }
+
+        if((strstr(act_znacka,znacka_auta)!=NULL)&&k==4)
+        {
+            if(act->cena-100<0)
+                act->cena=0;
+                else
+                act->cena-=100;
+            count++;
+        }
+
+    act=act->dalsi;
+    }
+    printf("Aktualizovalo sa %d zaznamov\n",count);
+    return prvy;
+}
 void k(FILE **file)
 {
     if(file!=NULL)
@@ -220,6 +269,7 @@ int main()
             case('v'): v(&file,&pocet_zaznamov,prvy);break;
             case('p'): prvy = p(&file,&pocet_zaznamov,prvy);break;
             case('h'): prvy = h(&file,&pocet_zaznamov,prvy);break;
+            case('a'): prvy = a(&file,&pocet_zaznamov,prvy);break;
         }
     }
     return 0;
