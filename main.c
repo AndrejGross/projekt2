@@ -13,9 +13,9 @@ struct inzeraty
     struct inzeraty *dalsi;
 };
 
-struct inzeraty* n(FILE **file,int *pocet_zaznamov)
+struct inzeraty* n(FILE **file,int *pocet_zaznamov, struct inzeraty *prvy)
 {
-    int pocitadlo=0,count=0;
+    int pocitadlo=0,count=0,len;
     char str[201];
 
     *file = fopen( "auta.txt" , "r");
@@ -31,15 +31,14 @@ struct inzeraty* n(FILE **file,int *pocet_zaznamov)
 
     rewind(*file);
 
-    struct inzeraty *prv;
     struct inzeraty *act;
-    prv=NULL;
-    if((prv = malloc(sizeof(struct inzeraty))) == NULL)
+    prvy=NULL;
+    if((prvy = malloc(sizeof(struct inzeraty))) == NULL)
     {
         printf("Malo pamate.\n");
         return 0;
     }
-    act=prv;
+    act=prvy;
     while(!feof(*file))
     {
         if((act->dalsi = malloc(sizeof(struct inzeraty))) == NULL)
@@ -51,13 +50,25 @@ struct inzeraty* n(FILE **file,int *pocet_zaznamov)
         fscanf(*file,"%*c");
         fscanf(*file,"%*c");
         fgets(act->kategoria,51,*file);
+        len=strlen(act->kategoria);
+        act->kategoria[len-1]='\0';
+
         fgets(act->znacka,51,*file);
+        len=strlen(act->znacka);
+        act->znacka[len-1]='\0';
+
         fgets(act->predajca,101,*file);
+        len=strlen(act->predajca);
+        act->predajca[len-1]='\0';
+
         fscanf(*file,"%d",&act->cena);
         fscanf(*file,"%*c");
         fscanf(*file,"%d",&act->rok_vyroby);
         fscanf(*file,"%*c");
+
         fgets(act->stav_vozidla,101,*file);
+        len=strlen(act->stav_vozidla);
+        act->stav_vozidla[len-1]='\0';
 
         act=act->dalsi;
         count++;
@@ -66,7 +77,7 @@ struct inzeraty* n(FILE **file,int *pocet_zaznamov)
 
         printf("Podarilo sa nacitat %d prvkov\n",count);
 
-    return prv;
+    return prvy;
 }
 void v(FILE **file,int *pocet_zaznamov, struct inzeraty *prvy)
 {
@@ -78,9 +89,9 @@ void v(FILE **file,int *pocet_zaznamov, struct inzeraty *prvy)
         if(count==*pocet_zaznamov+1)
             break;
         printf("%d.\n",count);
-        printf("kategoria: %s",act->kategoria);
-        printf("znacka: %s",act->znacka);
-        printf("predajca: %s",act->predajca);
+        printf("kategoria: %s\n",act->kategoria);
+        printf("znacka: %s\n",act->znacka);
+        printf("predajca: %s\n",act->predajca);
         printf("cena: %d\n",act->cena);
         printf("rok vyroby: %d\n",act->rok_vyroby);
         printf("stav vozidla: %s\n",act->stav_vozidla);
@@ -90,10 +101,55 @@ void v(FILE **file,int *pocet_zaznamov, struct inzeraty *prvy)
     }
 }
 
-/*struct inzeraty* p(FILE **file, int *pocet_zaznamov, struct *prvy)
+struct inzeraty* p(FILE **file, int *pocet_zaznamov, struct inzeraty *prvy)
 {
-return prvy;
-}*/
+    int k,poc=0;
+    struct inzeraty *act;
+    struct inzeraty *novy;
+    struct inzeraty *pred;
+    scanf("%d",&k);
+
+    if(k<0)
+        return 0;
+
+    if(k>*pocet_zaznamov)
+        k=*pocet_zaznamov+1;
+    act=prvy;
+
+    while(act!=NULL)
+    {
+        poc++;
+
+        if(k==poc+1||k==1)
+        {
+            novy=malloc(sizeof(struct inzeraty));
+                scanf("%*c");
+                printf("Mozes vypisovat\n");
+                scanf("%s",novy->kategoria);
+                scanf("%s",novy->znacka);
+                scanf("%s",novy->predajca);
+                scanf("%d",&novy->cena);
+                scanf("%*c");
+                scanf("%d",&novy->rok_vyroby);
+                scanf("%*c");
+                scanf("%s",novy->stav_vozidla);
+            if(act==prvy)
+            {
+                novy->dalsi=prvy;
+                prvy=novy;
+            }
+            else
+            {
+                novy->dalsi=act->dalsi;
+                act->dalsi=novy;
+            }
+            break;
+        }
+        act=act->dalsi;
+    }*pocet_zaznamov+=1;
+
+    return prvy;
+}
 
 void k(FILE **file)
 {
@@ -113,10 +169,10 @@ int main()
         scanf("%c",&c);
         switch(c)
         {
-            case('n'): prvy = n(&file,&pocet_zaznamov);break;
+            case('n'): prvy = n(&file,&pocet_zaznamov,prvy);break;
             case('k'): k(&file);break;
             case('v'): v(&file,&pocet_zaznamov,prvy);break;
-            //case('p'): prvy = p(&file,&pocet_zaznamov,prvy);break;
+            case('p'): prvy = p(&file,&pocet_zaznamov,prvy);break;
         }
     }
     return 0;
