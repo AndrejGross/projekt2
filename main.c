@@ -12,7 +12,6 @@ struct inzeraty
     char stav_vozidla[201];
     struct inzeraty *dalsi;
 };
-
 struct inzeraty* n(FILE **file,int *pocet_zaznamov, struct inzeraty *prvy)
 {
     int pocitadlo=0,count=0,len;
@@ -105,50 +104,59 @@ struct inzeraty* p(FILE **file, int *pocet_zaznamov, struct inzeraty *prvy)
     int k,poc=0;
     struct inzeraty *act;
     struct inzeraty *novy;
+    struct inzeraty *pred;
     scanf("%d",&k);
 
-    if(k<0)
+    if(k<=0)
         return 0;
 
     if(k>*pocet_zaznamov)
         k=*pocet_zaznamov+1;
-    act=prvy;
+
+    novy=malloc(sizeof(struct inzeraty));
+
+    printf("Mozes vypisovat\n");
+
+    scanf("%*c");
+    scanf("%s",novy->kategoria);
+    scanf("%s",novy->znacka);
+    scanf("%s",novy->predajca);
+    scanf("%d",&novy->cena);
+    scanf("%*c");
+    scanf("%d",&novy->rok_vyroby);
+    scanf("%*c");
+    scanf("%s",novy->stav_vozidla);
+
+    if(*pocet_zaznamov==0)
+    {
+        novy->dalsi=NULL;
+        *pocet_zaznamov+=1;
+        return novy;
+
+    }
+        act=prvy;
 
     while(act!=NULL)
     {
         poc++;
-
-        if(k==poc+1||k==1)
+        if(act==prvy&&k==1)
         {
-            novy=malloc(sizeof(struct inzeraty));
-                scanf("%*c");
-                printf("Mozes vypisovat\n");
-                scanf("%s",novy->kategoria);
-                scanf("%s",novy->znacka);
-                scanf("%s",novy->predajca);
-                scanf("%d",&novy->cena);
-                scanf("%*c");
-                scanf("%d",&novy->rok_vyroby);
-                scanf("%*c");
-                scanf("%s",novy->stav_vozidla);
-            if(act==prvy)
-            {
-                novy->dalsi=prvy;
-                prvy=novy;
-            }
-            else
-            {
-                novy->dalsi=act->dalsi;
-                act->dalsi=novy;
-            }
-            break;
+            novy->dalsi=prvy;
+            prvy=novy;
         }
-        act=act->dalsi;
-    }*pocet_zaznamov+=1;
+        else
+        if(k==poc+1)
+        {
+            novy->dalsi=act->dalsi;
+            act->dalsi=novy;
+        }
 
+    act=act->dalsi;
+    }
+    *pocet_zaznamov+=1;
     return prvy;
 }
-struct inzeraty* h(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
+struct inzeraty* h(FILE **file,struct inzeraty *prvy)
 {
     char znacka_auta[51],act_znacka[51];
     int cena_ponuky,count=0,i,j=0;
@@ -178,7 +186,7 @@ struct inzeraty* h(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
             i++;
         }
 
-        if((strstr(act_znacka,znacka_auta)!=NULL)&&(act->cena<=cena_ponuky))
+        if((strcmp(act_znacka,znacka_auta)==0)&&(act->cena<=cena_ponuky))
         {
             count++;
             printf("%d.\n",count);
@@ -196,7 +204,7 @@ struct inzeraty* h(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
 
     return prvy;
 }
-struct inzeraty* a(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
+struct inzeraty* a(FILE **file,struct inzeraty *prvy)
 {
     int rok_v,count=0,k,j=0,i;
     char znacka_auta[51],act_znacka[51],act_rok[10],zadanyRok[10];
@@ -232,7 +240,7 @@ struct inzeraty* a(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
                 k++;
         }
 
-        if((strstr(act_znacka,znacka_auta)!=NULL)&&k==4)
+        if((strcmp(act_znacka,znacka_auta)==0)&&k==4)
         {
             if(act->cena-100<0)
                 act->cena=0;
@@ -246,16 +254,20 @@ struct inzeraty* a(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
     printf("Aktualizovalo sa %d zaznamov\n",count);
     return prvy;
 }
+struct inzeraty* z(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
+{
+
+}
 void k(FILE **file)
 {
-    if(file!=NULL)
+    if(*file!=NULL)
         fclose(*file);
     //free(prvy);
     exit(EXIT_SUCCESS);
 }
 int main()
 {
-    FILE *file;
+    FILE *file=NULL;
     struct inzeraty *prvy;
     int pocet_zaznamov=0;
     char c;
@@ -268,8 +280,9 @@ int main()
             case('k'): k(&file);break;
             case('v'): v(&file,&pocet_zaznamov,prvy);break;
             case('p'): prvy = p(&file,&pocet_zaznamov,prvy);break;
-            case('h'): prvy = h(&file,&pocet_zaznamov,prvy);break;
-            case('a'): prvy = a(&file,&pocet_zaznamov,prvy);break;
+            case('h'): prvy = h(&file,prvy);break;
+            case('a'): prvy = a(&file,prvy);break;
+            case('z'): prvy = z(&file,&pocet_zaznamov,prvy);break;
         }
     }
     return 0;
