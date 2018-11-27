@@ -256,13 +256,55 @@ struct inzeraty* a(FILE **file,struct inzeraty *prvy)
 }
 struct inzeraty* z(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
 {
-
+    int j=0,i,count=0;
+    char znacka_auta[51],act_znacka[51];
+    struct inzeraty *pred;
+    struct inzeraty *act;
+    scanf("%s",znacka_auta);
+    while(znacka_auta[j])
+    {
+        if (znacka_auta[j]<'A'||znacka_auta[j]>'Z')
+            znacka_auta[j]=znacka_auta[j]-32;
+        j++;
+    }
+    act=prvy;
+    while(act!=NULL)
+    {
+        i=0;
+        sprintf(act_znacka,"%s",act->znacka);
+        while(act_znacka[i])
+        {
+            if (act_znacka[i]<'A'||act_znacka[i]>'Z')
+                act_znacka[i]=act_znacka[i]-32;
+            i++;
+        }
+        if(strstr(act_znacka,znacka_auta)!=NULL)
+        {
+            if(act==prvy)
+                prvy=prvy->dalsi;
+                else
+                pred->dalsi=act->dalsi;
+            free(act);
+            *pocet_zaznamov-=1;
+            count++;
+        }
+        pred=act;
+        act=act->dalsi;
+    }
+    printf("Vymazalo sa %d zaznamov\n",count);
+    return prvy;
 }
-void k(FILE **file)
+void k(FILE **file,struct inzeraty *prvy)
 {
+    struct inzeraty *act;
     if(*file!=NULL)
         fclose(*file);
-    //free(prvy);
+    act=prvy;
+    while(act!=NULL)
+    {
+        free(act);
+        act=act->dalsi;
+    }
     exit(EXIT_SUCCESS);
 }
 int main()
@@ -277,7 +319,7 @@ int main()
         switch(c)
         {
             case('n'): prvy = n(&file,&pocet_zaznamov,prvy);break;
-            case('k'): k(&file);break;
+            case('k'): k(&file,prvy);break;
             case('v'): v(&file,&pocet_zaznamov,prvy);break;
             case('p'): prvy = p(&file,&pocet_zaznamov,prvy);break;
             case('h'): prvy = h(&file,prvy);break;
