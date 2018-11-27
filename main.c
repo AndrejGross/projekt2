@@ -48,6 +48,7 @@ struct inzeraty* n(FILE **file,int *pocet_zaznamov, struct inzeraty *prvy)
 
         fscanf(*file,"%*c");
         fscanf(*file,"%*c");
+
         fgets(act->kategoria,51,*file);
         len=strlen(act->kategoria);
         act->kategoria[len-1]='\0';
@@ -299,10 +300,12 @@ void k(FILE **file,struct inzeraty *prvy)
     struct inzeraty *act;
     if(*file!=NULL)
         fclose(*file);
-    act=prvy;
+
+    act=prvy->dalsi;
     while(act!=NULL)
     {
-        free(act);
+        free(prvy);
+        prvy=act;
         act=act->dalsi;
     }
     exit(EXIT_SUCCESS);
