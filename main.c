@@ -284,12 +284,18 @@ struct inzeraty* z(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy)
             if(act==prvy)
                 prvy=prvy->dalsi;
                 else
+                {
+                    pred=prvy;
+                while(pred->dalsi!=act)
+                    pred=pred->dalsi;
                 pred->dalsi=act->dalsi;
+                }
+
             free(act);
             *pocet_zaznamov-=1;
             count++;
         }
-        pred=act;
+
         act=act->dalsi;
     }
     printf("Vymazalo sa %d zaznamov\n",count);
