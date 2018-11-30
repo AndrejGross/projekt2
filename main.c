@@ -14,7 +14,7 @@ struct inzeraty
 };
 struct inzeraty* n(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct inzeraty *act)
 {
-    int pocetZaznamov=0,dlzkaStringu;
+    int pocetZaznamov=0;
     char str[201];
 
     if((*file = fopen("auta.txt","r"))==NULL)
@@ -49,27 +49,18 @@ struct inzeraty* n(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
         }
         fscanf(*file,"%*c");
         fscanf(*file,"%*c");
-
-        fgets(act->kategoria,51,*file);
-        dlzkaStringu=strlen(act->kategoria);
-        act->kategoria[dlzkaStringu-1]='\0';
-
-        fgets(act->znacka,51,*file);
-        dlzkaStringu=strlen(act->znacka);
-        act->znacka[dlzkaStringu-1]='\0';
-
-        fgets(act->predajca,101,*file);
-        dlzkaStringu=strlen(act->predajca);
-        act->predajca[dlzkaStringu-1]='\0';
-
+        fscanf(*file,"%[^\n]",act->kategoria);
+        fscanf(*file,"%*c");
+        fscanf(*file,"%[^\n]",act->znacka);
+        fscanf(*file,"%*c");
+        fscanf(*file,"%[^\n]",act->predajca);
+        fscanf(*file,"%*c");
         fscanf(*file,"%d",&act->cena);
         fscanf(*file,"%*c");
         fscanf(*file,"%d",&act->rok_vyroby);
         fscanf(*file,"%*c");
-
-        fgets(act->stav_vozidla,101,*file);
-        dlzkaStringu=strlen(act->stav_vozidla);
-        act->stav_vozidla[dlzkaStringu-1]='\0';
+        fscanf(*file,"%[^\n]",act->stav_vozidla);
+        fscanf(*file,"%*c");
 
         act=act->dalsi;
     }
@@ -98,7 +89,7 @@ void v(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct inzeraty *ac
         poradie++;
     }
 }
-struct inzeraty* p(FILE **file, int *pocet_zaznamov, struct inzeraty *prvy,struct inzeraty *act,struct inzeraty *novy)
+struct inzeraty* p(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct inzeraty *act,struct inzeraty *novy)
 {
     int k,pocitadlo=0;
     scanf("%d",&k);
@@ -112,14 +103,18 @@ struct inzeraty* p(FILE **file, int *pocet_zaznamov, struct inzeraty *prvy,struc
     novy=malloc(sizeof(struct inzeraty));
 
     scanf("%*c");
-    scanf("%s",novy->kategoria);
-    scanf("%s",novy->znacka);
-    scanf("%s",novy->predajca);
+    scanf("%[^\n]",novy->kategoria);
+    scanf("%*c");
+    scanf("%[^\n]",novy->znacka);
+    scanf("%*c");
+    scanf("%[^\n]",novy->predajca);
+    scanf("%*c");
     scanf("%d",&novy->cena);
     scanf("%*c");
     scanf("%d",&novy->rok_vyroby);
     scanf("%*c");
-    scanf("%s",novy->stav_vozidla);
+    scanf("%[^\n]",novy->stav_vozidla);
+    scanf("%*c");
 
     if(*pocet_zaznamov==0)
     {
@@ -155,17 +150,22 @@ struct inzeraty* h(FILE **file,struct inzeraty *prvy,struct inzeraty *act)
     char znacka_auta[51],act_znacka[51];
     int cena_ponuky,poradie=0,i,j=0;
 
-    scanf("%s",znacka_auta);
+    scanf("%*c");
+    scanf("%[^\n]",znacka_auta);
+    scanf("%*c");
     scanf("%d",&cena_ponuky);
 
-    act=prvy;
     while(znacka_auta[j])
         {
-            if (znacka_auta[j]<'A'||znacka_auta[j]>'Z')
-                znacka_auta[j]=znacka_auta[j]-32;
+            if(znacka_auta[j]!=' ')
+            {
+                if (znacka_auta[j]<'A'||znacka_auta[j]>'Z')
+                    znacka_auta[j]=znacka_auta[j]-32;
+            }
             j++;
         }
 
+    act=prvy;
     while(act!=NULL)
     {
         i=0;
@@ -173,8 +173,11 @@ struct inzeraty* h(FILE **file,struct inzeraty *prvy,struct inzeraty *act)
 
         while(act_znacka[i])
         {
-            if (act_znacka[i]<'A'||act_znacka[i]>'Z')
-                act_znacka[i]=act_znacka[i]-32;
+            if(act_znacka[i]!=' ')
+            {
+                 if (act_znacka[i]<'A'||act_znacka[i]>'Z')
+                    act_znacka[i]=act_znacka[i]-32;
+            }
             i++;
         }
 
@@ -195,13 +198,21 @@ struct inzeraty* h(FILE **file,struct inzeraty *prvy,struct inzeraty *act)
         printf("V ponuke nie su pozadovane auta\n");
     return prvy;
 }
-struct inzeraty* a(FILE **file,struct inzeraty *prvy,struct inzeraty *act)
+struct inzeraty* a(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct inzeraty *act)
 {
     int rokVyroby,pocitadlo=0,j=0,i;
     char znacka_auta[51],act_znacka[51];
 
-    scanf("%s",znacka_auta);
+    scanf("%*c");
+    scanf("%[^\n]",znacka_auta);
+    scanf("%*c");
     scanf("%d",&rokVyroby);
+
+    if(*pocet_zaznamov==0)
+        {
+            printf("Aktualizovalo sa %d zaznamov\n",pocitadlo);
+            return 0;
+        }
 
     act=prvy;
 
@@ -316,7 +327,7 @@ int main()
             case('v'): v(&file,&pocet_zaznamov,prvy,act);break;
             case('p'): prvy = p(&file,&pocet_zaznamov,prvy,act,novy);break;
             case('h'): prvy = h(&file,prvy,act);break;
-            case('a'): prvy = a(&file,prvy,act);break;
+            case('a'): prvy = a(&file,&pocet_zaznamov,prvy,act);break;
             case('z'): prvy = z(&file,&pocet_zaznamov,prvy,act,pred);break;
         }
     }
