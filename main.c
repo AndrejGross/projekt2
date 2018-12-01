@@ -4,6 +4,7 @@
 
 struct inzeraty
 {
+//zadefinovanie ötrukt˙ry
     char kategoria[51];
     char znacka[51];
     char predajca[101];
@@ -17,36 +18,26 @@ struct inzeraty* n(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
     int pocetZaznamov=0;
     char str[201];
 
-    if((*file = fopen("auta.txt","r"))==NULL)
-    {
-        printf("Nepodarilo sa otvorit subor\n");
+    if((*file=fopen("auta.txt","r"))==NULL) //otvorenie s˙boru + kontrola
         return 0;
-    }
 
+//poËÌtanie z·znamov na z·klade v˝skytu znaku $
     if (*file)
     {
-        while (fscanf(*file, "%s", str)!=EOF)
+        while(fscanf(*file,"%s",str)!=EOF)
             if(str[0]=='$')
                 pocetZaznamov++;
     }
-    *pocet_zaznamov=pocetZaznamov;
+    *pocet_zaznamov=pocetZaznamov; //poËet z·znamov priradÌm smernÌku
 
-    rewind(*file);
+    rewind(*file); //na zaûiatok s˙boru
 
-    if((prvy = malloc(sizeof(struct inzeraty))) == NULL)
-    {
-        printf("Malo pamate.\n");
+    if((prvy=malloc(sizeof(struct inzeraty)))==NULL) //alokujem prvy z·znam
         return 0;
-    }
 
     act=prvy;
-    while(!feof(*file))
+    while(!feof(*file)) //po koniec s˙boru naËÌtava hodnoty zo s˙bora do z·znamov
     {
-        if((act->dalsi = malloc(sizeof(struct inzeraty))) == NULL)
-        {
-            printf("Malo pamate.\n");
-            break;
-        }
         fscanf(*file,"%*c");
         fscanf(*file,"%*c");
         fscanf(*file,"%[^\n]",act->kategoria);
@@ -62,18 +53,21 @@ struct inzeraty* n(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
         fscanf(*file,"%[^\n]",act->stav_vozidla);
         fscanf(*file,"%*c");
 
-        act=act->dalsi;
+        if((act->dalsi=malloc(sizeof(struct inzeraty)))==NULL) //alokujem miesto pre Ôalöi z·znam
+            return 0;
+
+        act=act->dalsi; //pos˙vanie sa v medzi z·znammi
     }
-    printf("Podarilo sa nacitat %d prvkov\n",pocetZaznamov);
-    return prvy;
+    printf("Nacitalo sa %d zaznamov\n",pocetZaznamov);
+
+    return prvy; //vraciam smernik na prv˝ z·znam
 }
 void v(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct inzeraty *act)
 {
     int poradie=1;
 
-    act = prvy;
-
-    while(act != NULL)
+    act=prvy;
+    while(act!=NULL) //vypisovanie z·znamov k˝m nieje aktu·lny z·znam pr·zdny
     {
         if(poradie==*pocet_zaznamov+1)
             break;
@@ -82,11 +76,11 @@ void v(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct inzeraty *ac
         printf("znacka: %s\n",act->znacka);
         printf("predajca: %s\n",act->predajca);
         printf("cena: %d\n",act->cena);
-        printf("rok vyroby: %d\n",act->rok_vyroby);
-        printf("stav vozidla: %s\n",act->stav_vozidla);
+        printf("rok_vyroby: %d\n",act->rok_vyroby);
+        printf("stav_vozidla: %s\n",act->stav_vozidla);
 
         act=act->dalsi;
-        poradie++;
+        poradie++; //poËÌtadlo pre poradie
     }
 }
 struct inzeraty* p(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct inzeraty *act,struct inzeraty *novy)
@@ -94,14 +88,16 @@ struct inzeraty* p(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
     int k,pocitadlo=0;
     scanf("%d",&k);
 
-    if(k<=0)
+    if(k<=0) //ak je naËÌtanÈ ËÌslo menöie alebo rovnÈ nule, funkcia nepokraËuje
         return 0;
 
-    if(k>*pocet_zaznamov)
+    if(k>*pocet_zaznamov) //ak je poËet z·znamov v‰ËöÌ ako naËÌtanÈ ËÌslo, z·znam sa zapÌöe na koniec
         k=*pocet_zaznamov+1;
 
-    novy=malloc(sizeof(struct inzeraty));
+    if((novy=malloc(sizeof(struct inzeraty)))==NULL)
+       return 0;
 
+//naËÌtavanie novÈho z·znam
     scanf("%*c");
     scanf("%[^\n]",novy->kategoria);
     scanf("%*c");
@@ -116,7 +112,7 @@ struct inzeraty* p(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
     scanf("%[^\n]",novy->stav_vozidla);
     scanf("%*c");
 
-    if(*pocet_zaznamov==0)
+    if(*pocet_zaznamov==0) //ak je poËet z·znamov 0, tak sa nov˝ z·znam uloûÌ na prvnÈ miesto
     {
         novy->dalsi=NULL;
         *pocet_zaznamov+=1;
@@ -128,13 +124,13 @@ struct inzeraty* p(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
     while(act!=NULL)
     {
         pocitadlo++;
-        if(act==prvy&&k==1)
+        if(act==prvy&&k==1) //ak chceme uloûiù z·znam na prvÈ miesto
         {
             novy->dalsi=prvy;
             prvy=novy;
         }
         else
-        if(k==pocitadlo+1)
+        if(k==pocitadlo+1) //ak chceme uloûiù z·znam na hoci akÈ inÈ miesto
         {
             novy->dalsi=act->dalsi;
             act->dalsi=novy;
@@ -151,11 +147,11 @@ struct inzeraty* h(FILE **file,struct inzeraty *prvy,struct inzeraty *act)
     int cena_ponuky,poradie=0,i,j=0;
 
     scanf("%*c");
-    scanf("%[^\n]",znacka_auta);
+    scanf("%[^\n]",znacka_auta); //naËÌtanie znaËky auta
     scanf("%*c");
-    scanf("%d",&cena_ponuky);
+    scanf("%d",&cena_ponuky); //naËÌtanie ceny
 
-    while(znacka_auta[j])
+    while(znacka_auta[j]) //zmena na veækÈ pÌsmen·
         {
             if(znacka_auta[j]!=' ')
             {
@@ -169,9 +165,9 @@ struct inzeraty* h(FILE **file,struct inzeraty *prvy,struct inzeraty *act)
     while(act!=NULL)
     {
         i=0;
-        sprintf(act_znacka,"%s",act->znacka);
+        sprintf(act_znacka,"%s",act->znacka); //vytvorenie pomocnej pre aktu·lnu znaËku prvku
 
-        while(act_znacka[i])
+        while(act_znacka[i])  //zmena na veækÈ pÌsmen·
         {
             if(act_znacka[i]!=' ')
             {
@@ -181,21 +177,22 @@ struct inzeraty* h(FILE **file,struct inzeraty *prvy,struct inzeraty *act)
             i++;
         }
 
-        if((strcmp(act_znacka,znacka_auta)==0)&&(act->cena<=cena_ponuky))
-        {
-            poradie++;
+        if((strcmp(act_znacka,znacka_auta)==0)&&(act->cena<=cena_ponuky))   //ak je lex. dÂûka zhodn·
+        {                                                                   //a z·roveÚ cena auta je menöia
+            poradie++;                                                      //alebo rovn· zadanej tak z·znam vypÌöe
             printf("%d.\n",poradie);
             printf("kategoria: %s\n",act->kategoria);
             printf("znacka: %s\n",act->znacka);
             printf("predajca: %s\n",act->predajca);
             printf("cena: %d\n",act->cena);
-            printf("rok vyroby: %d\n",act->rok_vyroby);
-            printf("stav vozidla: %s\n",act->stav_vozidla);
+            printf("rok_vyroby: %d\n",act->rok_vyroby);
+            printf("stav_vozidla: %s\n",act->stav_vozidla);
         }
         act=act->dalsi;
     }
-    if(poradie==0)
+    if(poradie==0) //ak nieje ûiadny z·znam vyhovuj˙ci
         printf("V ponuke nie su pozadovane auta\n");
+
     return prvy;
 }
 struct inzeraty* a(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct inzeraty *act)
@@ -208,7 +205,7 @@ struct inzeraty* a(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
     scanf("%*c");
     scanf("%d",&rokVyroby);
 
-    if(*pocet_zaznamov==0)
+    if(*pocet_zaznamov==0) //ak je poËet z·znamov 0, funkcia nepokraËuje
         {
             printf("Aktualizovalo sa %d zaznamov\n",pocitadlo);
             return 0;
@@ -216,7 +213,7 @@ struct inzeraty* a(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
 
     act=prvy;
 
-    while(znacka_auta[j])
+    while(znacka_auta[j]) //na veækÈ pÌsmen·
         {
             if (znacka_auta[j]<'A'||znacka_auta[j]>'Z')
                 znacka_auta[j]=znacka_auta[j]-32;
@@ -226,26 +223,27 @@ struct inzeraty* a(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
     while(act!=NULL)
     {
         i=0;
-        sprintf(act_znacka,"%s",act->znacka);
+        sprintf(act_znacka,"%s",act->znacka); //vytvorenie pomocnej pre aktu·lnu znaËku
 
-        while(act_znacka[i])
+        while(act_znacka[i]) //na veækÈ pÌsmen·
         {
             if (act_znacka[i]<'A'||act_znacka[i]>'Z')
                 act_znacka[i]=act_znacka[i]-32;
             i++;
         }
 
-        if(strcmp(act_znacka,znacka_auta)==0&&act->rok_vyroby==rokVyroby)
-        {
-            if(act->cena-100<0)
+        if(strcmp(act_znacka,znacka_auta)==0&&act->rok_vyroby==rokVyroby)   //ak je lex. dÂûka zhodn·
+        {                                                                   //a zadan˝ rok v˝roby sa zhoduje
+            if(act->cena-100<0)                                             //s rokom v˝roby auta tak sa z·znam vypÌöe
                 act->cena=0;
                 else
                 act->cena-=100;
-            pocitadlo++;
+            pocitadlo++; //poËÌtadlo pre vyhovuj˙ce z·znamy
         }
     act=act->dalsi;
     }
     printf("Aktualizovalo sa %d zaznamov\n",pocitadlo);
+
     return prvy;
 }
 struct inzeraty* z(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct inzeraty *act,struct inzeraty *pred)
@@ -253,51 +251,65 @@ struct inzeraty* z(FILE **file,int *pocet_zaznamov,struct inzeraty *prvy,struct 
     int pocitadlo=0,j=0,i;
     char znacka_auta[51],act_znacka[51];
 
-    scanf("%s",znacka_auta);
+    scanf("%*c");
+    scanf("%[^\n]",znacka_auta); //naËÌtanie znaËky auta
+    scanf("%*c");
 
-    while(znacka_auta[j])
+    while(znacka_auta[j]) //na veækÈ pÌsmen·
     {
-        if (znacka_auta[j]<'A'||znacka_auta[j]>'Z')
-            znacka_auta[j]=znacka_auta[j]-32;
+        if(znacka_auta[j]!=' ')
+        {
+            if (znacka_auta[j]<'A'||znacka_auta[j]>'Z')
+                znacka_auta[j]=znacka_auta[j]-32;
+        }
         j++;
+
     }
 
     act=prvy;
     while(act!=NULL)
     {
         i=0;
-        sprintf(act_znacka,"%s",act->znacka);
+        sprintf(act_znacka,"%s",act->znacka); //vytvorenie pomocnej pre aktu·lnu znaËku auta
         while(act_znacka[i])
         {
-            if (act_znacka[i]<'A'||act_znacka[i]>'Z')
-                act_znacka[i]=act_znacka[i]-32;
+            if(act_znacka[i]!=' ')
+            {
+                if (act_znacka[i]<'A'||act_znacka[i]>'Z')
+                    act_znacka[i]=act_znacka[i]-32;
+            }
             i++;
         }
-        if(strstr(act_znacka,znacka_auta)!=NULL)
+        if(strstr(act_znacka,znacka_auta)!=NULL) //ak sa string znacka_auta nach·dza v znaËke auta aktu·lneho z·znamu
         {
-            if(act==prvy)
-                prvy=prvy->dalsi;
-                else
-                {
-                    pred=prvy;
-                    while(pred->dalsi!=act)
-                        pred=pred->dalsi;
-                    pred->dalsi=act->dalsi;
-                }
-            free(act);
-            *pocet_zaznamov-=1;
-            pocitadlo++;
+            if(act==prvy) //ak je aktu·lny z·znam z·roveÚ aj prv˝
+            {
+                prvy=prvy->dalsi; //nasleduj˙ci z·znam po prvom sa st·va prv˝m
+            }
+            else
+            {
+                pred=prvy;              //ak nie akt. z·znam prv˝, tak predch·dzaj˙ci je prv˝
+                while(pred->dalsi!=act) //k˝m sa predch·dzaj˙ci ÔalöÌ nerovn· aktu·lnemu z·znamu
+                    pred=pred->dalsi;   //prehlad·vanie medzi z·znammi
+
+                pred->dalsi=act->dalsi; //ak je predch·dzaj˙ci ÔalöÌ rovn˝ aktu·lnemu z·znamu, tak akt. ÔalöÌ je pred. ÔalöÌ
+            }
+            *pocet_zaznamov-=1; //odpoËÌta 1 z poËtu prvkov
+            free(act);          //odstr·Ú aktu·lny z·znam
+            pocitadlo++;        //poËÌtadlo pre poËet vymazan˝ch z·znamov
         }
-        act=act->dalsi;
+        act=act->dalsi; //prech·dzanie z·znammi
     }
     printf("Vymazalo sa %d zaznamov\n",pocitadlo);
+
     return prvy;
 }
 void k(FILE **file,struct inzeraty *prvy,struct inzeraty *act)
 {
-    if(*file!=NULL)
+    if(*file!=NULL) //ak bol s˙bor otvoren˝, tak s˙bor zavrie
         fclose(*file);
 
+//mazanie z·znamov
     act=prvy->dalsi;
     while(act!=NULL)
     {
@@ -305,30 +317,33 @@ void k(FILE **file,struct inzeraty *prvy,struct inzeraty *act)
         prvy=act;
         act=act->dalsi;
     }
-    exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS); //ukonËenie programu
 }
 int main()
 {
-    FILE *file=NULL;
+    int pocet_zaznamov=0;
+    char c;
+
+    FILE *file=NULL; //zadefinovanie s˙boru
+
+    //zadefinovanie pointrov na ötrukt˙ru
     struct inzeraty *prvy;
     struct inzeraty *act;
     struct inzeraty *pred;
     struct inzeraty *novy;
 
-    int pocet_zaznamov=0;
-    char c;
-    while(1)
+    while(1) //nekoneËn˝ cyklus
     {
-        scanf("%c",&c);
-        switch(c)
+        scanf("%c",&c); //naËÌtavanie znaku pre volanie funkcie
+        switch(c)       //switch pre vyberanie funkcie
         {
-            case('n'): prvy = n(&file,&pocet_zaznamov,prvy,act);break;
-            case('k'): k(&file,prvy,act);break;
-            case('v'): v(&file,&pocet_zaznamov,prvy,act);break;
-            case('p'): prvy = p(&file,&pocet_zaznamov,prvy,act,novy);break;
-            case('h'): prvy = h(&file,prvy,act);break;
-            case('a'): prvy = a(&file,&pocet_zaznamov,prvy,act);break;
-            case('z'): prvy = z(&file,&pocet_zaznamov,prvy,act,pred);break;
+            case('n'): prvy = n(&file,&pocet_zaznamov,prvy,act);break;      //naËÌtanie z·znamov zo s˙bora
+            case('k'): k(&file,prvy,act);break;                             //vyËistenie pam‰te, zatvorenie s˙boru a ukonËenie programu
+            case('v'): v(&file,&pocet_zaznamov,prvy,act);break;             //v˝pis z·znamov
+            case('p'): prvy = p(&file,&pocet_zaznamov,prvy,act,novy);break; //vloûenie z·znamu
+            case('h'): prvy = h(&file,prvy,act);break;                      //vyhæadaù a vypÌsaù z·znamy podæa znaËky auta a ceny ponuky
+            case('a'): prvy = a(&file,&pocet_zaznamov,prvy,act);break;      //aktualiz·cia z·znamu podæa znaËky auta a roku v˝roby
+            case('z'): prvy = z(&file,&pocet_zaznamov,prvy,act,pred);break; //mazanie z·znamov podæa znaËky auta
         }
     }
     return 0;
